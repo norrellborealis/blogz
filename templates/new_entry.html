@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+<style>
+    .error {color: red;
+    }
+
+</style>
+
+
+{% block content %}
+    <h1  align="center">Create Your Blog!</h1>
+
+    <hr />
+    <form action="/new_post" method="post">
+        <table>
+            <tr>
+                <td><label for="title">Title</label></td>
+                <td>
+                    <input name='title' type="text" />
+                    <span class="error">{{title_error}}</span>
+                </td>
+            </tr>
+            <tr>
+                <td><label for="body">Blog Entry</label></td>
+                <td>
+                    <textarea name='body' rows="4" cols="50"></textarea>
+                    <span class="error">{{body_error}}</span>
+                </td>
+            </tr>
+        </table>
+        <input type="submit" value="Sumbit">
+    </form>
+           
+{% endblock %}
