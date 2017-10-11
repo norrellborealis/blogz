@@ -7,42 +7,49 @@ app.config['DEBUG'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://build-a-blog:pizza1229@localhost:8889/build-a-blog'
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
+app.secret_key = 'ToUcEt101031'
 
 class Blog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120))
-    textbody = db.Column(db.String(220))
+    body = db.Column(db.String(220))
 
     def __init__(self, title, textbody):
         self.title = title
-        self.textbody = textbody
+        self.body = body
 
-@app.route("/", methods=["GET", "POST"])
+@app.route('/', methods=['POST', 'GET'])
 def index():
-    return render_tempalte("index.html")
+    if request.method == 'POST':
+        title = request.form['title']
+        blog = request.form['blog']
+        if not title or not blog:
+            flash('Invalid title or entry', 'error')
+            return render_template('new_post.html')
 
-@app.route("/blog", methods["POST", "GET"])
-def blog():
-    id = request.args.get("id")
-    focus = False
-    if id:
-        focus = Blog.query.filter_by(id = id)[0]
-
+        else:
+            new_entry = Blog(title,blog)
+            db.session.add(new_entry)
+            db.session.commit()
+            return render_template('view_entry.html', title=title, body=blog)
+    
     blogs = Blog.query.all()
-    return render_tempalte("blog.html", blogs=blogs, focus=focus)
 
-@app.route("/new_post", methods=["GET", "POST"])
-def new_post():
-    if request.method == "POST":
-        if request.form["title"] == "" or request.form["body"] == "":
-            return redirect("/new_post?error=" + str(True))
-        title = request.form["title"]
-        textbody = request.form["textbody"]
-        db.session.add(Blog(title,body))
-        db.session.commit()
-        id = db.engine.execute("SELECT MAX(id) from blog;").fetchone()[0]
-        return redirect("/blog?id=" + str(id))
-    return render_template("new_post.html", error=request.args.get('error'))
+    return render_template('blog_home.html', blogs=blogs)
+
+@app.route('/blog')
+def blog():
+    id=request.args.get('id')
+    blog = Blog.query.get(id)
+    title = blog.title
+    body = blog.body
+
+    return render_template('view_entry.html', title=title, body=body)
+
+@app.route('/new_entry', methods=['GET', 'POST'])
+def new_entry():
+    return render_template('new_entry.html')
+
 
 if __name__ == "__main__":
     app.run(debug=True)
