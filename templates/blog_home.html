@@ -7,17 +7,19 @@
     <p>No entries yet</p>
 
     {% else %}
-            {% for blog in blogs %}
-
-            <div>
+    <br>
+        <div>
+            {% for blog in blogs %}        
                 <h4><a href = '/blog?id={{blog.id}}'>{{blog.title}}</a></h4>
-                
+                <p>{{blog.body}}</p>
+                <br>
+                ({{blog.date}})
+                <br>
+                by <a href="./blog?user={{owner.id}}">{{blog.owner.email}}</a>
                 <hr />
 
-            </div>
-
             {% endfor %}
-    
+        </div>
     {% endif %}
            
             
