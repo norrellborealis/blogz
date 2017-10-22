@@ -93,7 +93,7 @@ def new_entry():
             blog_url = "/blog?id=" + str(new_post.id)
             return redirect(blog_url)
 
-        return render_template("blog_vorm.html", title="Create a new blog entry", title_err=title_err, body_err=body_err)
+        return render_template("blog_form.html", title="Create a new blog entry", title_err=title_err, body_err=body_err)
 
 
 @app.route('/signup', methods=['POST', 'GET'])
