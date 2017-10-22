@@ -24,7 +24,7 @@ class Blog(db.Model):
         self.owner = owner
 
 class User(db.Model):
-    id = db.Column(db.integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(20))
     blogs = db.relationship('Blog', backref='owner')
@@ -35,7 +35,7 @@ class User(db.Model):
 
 @app.before_request
 def get_login():
-    allowed_routes - ['login', 'signup', 'blog', 'index']
+    allowed_routes = ['login', 'signup', 'blog', 'index']
     if request.endpoint not in allowed_routes and 'email' not in session:
         return redirect('/login')
 
@@ -132,7 +132,7 @@ def signup():
     return render_template('signup.html', title="Become a member of our Blog!", email_err=email_err, password_err=password_err, verify_err=verify_err)
 
 
-@app.route('login', methods=['POST', 'GET'])
+@app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
         email = request.form['email']
