@@ -5,7 +5,6 @@
     {% for post in posts %}
         <h1><a href="./blog?id={{post.id}}">{{post.title}}</a></h1>
         <p>{{post.body}}</p>
-        <div>({{blo.date}})</div>
         <div>by <a href="./blog?user={{user.id}}">{{post.owner.email}}</a></div>
 
         <hr />

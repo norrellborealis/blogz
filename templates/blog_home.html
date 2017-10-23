@@ -10,12 +10,10 @@
     <br>
         <div>
             {% for blog in blogs %}        
-                <h4><a href = '/blog?id={{post.id}}'>{{post.title}}</a></h4>
-                <p>{{post.body}}</p>
+                <h4><a href = '/blog?id={{post.id}}'>{{blog.title}}</a></h4>
+                <p>{{blog.body}}</p>
                 <br>
-                ({{post.date}})
-                <br>
-                Written by: <a href="./blog?user={{owner.id}}">{{post.owner.email}}</a>
+                Written by: <a href="./blog?user={{owner.id}}">{{blog.owner.email}}</a>
                 <hr />
 
             {% endfor %}

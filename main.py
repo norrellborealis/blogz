@@ -1,6 +1,6 @@
 from flask import Flask, request, redirect, render_template, flash, session
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+
 
 app = Flask(__name__)
 
@@ -14,13 +14,11 @@ class Blog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120))
     body = db.Column(db.String(220))
-    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-    def __init__(self, title, body, date, owner):
+    def __init__(self, title, body, owner):
         self.title = title
         self.body = body
-        self.date = date
         self.owner = owner
 
 class User(db.Model):
@@ -54,17 +52,16 @@ def blog_list():
     if request.args.get("id"):
         blog_id = request.args.get('id')
         blog = Blog.query.get(blog_id)
-        blog_date = request.args.get('date')
-        return render_template("view_entry.html", blog=blog, blog_date=blog_date)
+        return render_template("view_entry.html", blog=blog)
 
     elif request.args.get("user"):
         user_id = request.args.get('user')
         user = User.query.get(user_id)
-        posts = Blog.query.filter_by(owner=user).order_by(Blog.date.desc()).all()
+        posts = Blog.query.filter_by(owner=user).order_by(Blog.id.desc()).all()
         return render_template("singleUser.html", user=user, posts=posts)
 
     else:
-        posts = Blog.query.order_by(Blog.date.desc()).all()
+        posts = Blog.query.order_by(blog.id.desc()).all()
         return render_template('blog_home.html', title="Build Your Blog", posts=posts, owner=owner)
 
 @app.route('/new_entry', methods=['GET', 'POST'])
@@ -75,7 +72,6 @@ def new_entry():
     if request.method == 'POST':
         title = request.form['title']
         body = request.form['body']
-        date = request.args.get('date')
         owner = User.query.filter_by(email=session['email']).first()
         title_err = ''
         body_err = ''
@@ -87,10 +83,10 @@ def new_entry():
             body_err = "Add some post content."
 
         if not title_err and not body_err:
-            new_post = Blog(title, body, date, owner)
-            db.session.add(new_entry)
+            new_post = Blog(title, body, owner)
+            db.session.add(new_post)
             db.session.commit()
-            blog_url = "/blog?id=" + str(new_entry.id)
+            blog_url = "/blog?id=" + str(new_post.id)
             return redirect(blog_url)
 
         return render_template("new_entry.html", title="Create a new blog entry", title_err=title_err, body_err=body_err)
