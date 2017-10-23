@@ -17,7 +17,7 @@ class Blog(db.Model):
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-    def __init__(self, title, body):
+    def __init__(self, title, body, date, owner):
         self.title = title
         self.body = body
         self.date = date
@@ -48,7 +48,7 @@ def index():
 
 
 @app.route('/blog', methods = ['POST', 'GET'])
-def blog():
+def blog_list():
     owner = User.query.filter_by(email=session['email']).first()
 
     if request.args.get("id"):
@@ -61,11 +61,11 @@ def blog():
         user_id = request.args.get('user')
         user = User.query.get(user_id)
         posts = Blog.query.filter_by(owner=user).order_by(Blog.date.desc()).all()
-        return render_template("single_user.html", user=user, posts=posts)
+        return render_template("singleUser.html", user=user, posts=posts)
 
     else:
         posts = Blog.query.order_by(Blog.date.desc()).all()
-        return render_template('blog_list.html', title="Build Your Blog", posts=posts, owner=owner)
+        return render_template('blog_home.html', title="Build Your Blog", posts=posts, owner=owner)
 
 @app.route('/new_entry', methods=['GET', 'POST'])
 def new_entry():
@@ -81,19 +81,19 @@ def new_entry():
         body_err = ''
 
         if len(title) < 1:
-            title_err = "You forgot a title"
+            title_err = "You forgot a title."
         
         if len(body) < 1:
-            body_err = "Write something to post"
+            body_err = "Add some post content."
 
         if not title_err and not body_err:
             new_post = Blog(title, body, date, owner)
-            db.session.add(new_blog)
+            db.session.add(new_entry)
             db.session.commit()
-            blog_url = "/blog?id=" + str(new_post.id)
+            blog_url = "/blog?id=" + str(new_entry.id)
             return redirect(blog_url)
 
-        return render_template("blog_form.html", title="Create a new blog entry", title_err=title_err, body_err=body_err)
+        return render_template("new_entry.html", title="Create a new blog entry", title_err=title_err, body_err=body_err)
 
 
 @app.route('/signup', methods=['POST', 'GET'])
@@ -127,7 +127,7 @@ def signup():
             db.session.add(new_user)
             db.session.commit()
             session['email'] = email
-            return redirect('/blog_form')
+            return redirect('/new_entry')
 
     return render_template('signup.html', title="Become a member of our Blog!", email_err=email_err, password_err=password_err, verify_err=verify_err)
 
@@ -142,9 +142,9 @@ def login():
             session['email'] = email
             flash("Login successful")
             print(session)
-            return redirect('/blog_form')
+            return redirect('/new_entry')
         else:
-            flash('Password incorrect or user does not exist', 'error')
+            flash('Password incorrect or user does not exist', 'Error')
 
     return render_template('login.html', title="Log in to contribute.")
 
