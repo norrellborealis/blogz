@@ -138,17 +138,18 @@ def new_entry():
         body_err = ''
 
         if len(title) < 1:
-            title_err = "You forgot a title."
+            title_err = "Your post needs a title."
         
         if len(body) < 1:
-            body_err = "Add some post content."
+            body_err = "Type something here."
 
-        if not title_err and not body_err:
-            blog = Blog(title, body, owner)
-            db.session.add(blog)
-            db.session.commit()
-            id = blog.id
-            id_str = str(id)
+    if not title_err and not body_err:
+        blog = Blog(title, body, owner)
+        db.session.add(blog)
+        db.session.commit()
+
+        id = blog.id
+        id_str = str(id)
 
         return redirect('/blog?id=' + id_str)
 
