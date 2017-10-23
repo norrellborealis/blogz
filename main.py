@@ -46,7 +46,7 @@ def index():
 
 
 @app.route('/blog', methods = ['POST', 'GET'])
-def blog_list():
+def blog_index():
     owner = User.query.filter_by(email=session['email']).first()
 
     if request.args.get("id"):
@@ -57,12 +57,13 @@ def blog_list():
     elif request.args.get("user"):
         user_id = request.args.get('user')
         user = User.query.get(user_id)
-        posts = Blog.query.filter_by(owner=user).order_by(Blog.id.desc()).all()
+        posts = Blog.query.filter_by(owner=user).all()
         return render_template("singleUser.html", user=user, posts=posts)
 
     else:
-        posts = Blog.query.order_by(blog.id.desc()).all()
-        return render_template('blog_home.html', title="Build Your Blog", posts=posts, owner=owner)
+        posts = Blog.query.all()
+        return render_template('blog_home.html', title="Create your blog!", posts=posts, owner=owner)
+
 
 @app.route('/new_entry', methods=['GET', 'POST'])
 def new_entry():
@@ -83,14 +84,15 @@ def new_entry():
             body_err = "Add some post content."
 
         if not title_err and not body_err:
-            new_post = Blog(title, body, owner)
-            db.session.add(new_post)
+            blog = Blog(title, body, owner)
+            db.session.add(blog)
             db.session.commit()
-            blog_url = "/blog?id=" + str(new_post.id)
-            return redirect(blog_url)
+            id = blog.id
+            id_str = str(id)
+        return redirect('/blog?id=' + id_str)
 
+    else:
         return render_template("new_entry.html", title="Create a new blog entry", title_err=title_err, body_err=body_err)
-
 
 @app.route('/signup', methods=['POST', 'GET'])
 def signup():
