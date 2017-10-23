@@ -8,10 +8,10 @@
 
 
 {% block content %}
-    <h1  align="center">Create Your Blog!</h1>
+    <h1  align="center">Add To Your Blog!</h1>
 
     <hr />
-    <form action="/new_entry" method="POST">
+    <form action="/new_entry" method="post">
         <table>
             <tr>
                 <td><label for="title">Title</label></td>
@@ -28,7 +28,7 @@
                 </td>
             </tr>
         </table>
-        <input type="submit" value="Sumbit">
+        <input type="submit" value="Submit">
     </form>
            
 {% endblock %}

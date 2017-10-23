@@ -5,20 +5,25 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 
 app.config['DEBUG'] = True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blogz:pizza1229@localhost:8889/blogz'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blogz:blogz@localhost:8889/blogz'
 app.config['SQLALCHEMY_ECHO'] = True
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+
 db = SQLAlchemy(app)
+
 app.secret_key = 'Bear11TkFox9WtNeRdS225'
 
 class Blog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120))
     body = db.Column(db.String(220))
+   
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __init__(self, title, body, owner):
         self.title = title
         self.body = body
+        
         self.owner = owner
 
 class User(db.Model):
@@ -46,9 +51,7 @@ def index():
 
 
 @app.route('/blog', methods = ['POST', 'GET'])
-def blog_index():
-    owner = User.query.filter_by(email=session['email']).first()
-
+def blog():
     if request.args.get("id"):
         blog_id = request.args.get('id')
         blog = Blog.query.get(blog_id)
@@ -62,8 +65,7 @@ def blog_index():
 
     else:
         posts = Blog.query.all()
-        return render_template('blog_home.html', title="Create your blog!", posts=posts, owner=owner)
-
+        return render_template('blog_home.html', title="Build Your Blog", posts=posts)
 
 @app.route('/new_entry', methods=['GET', 'POST'])
 def new_entry():
@@ -73,6 +75,7 @@ def new_entry():
     if request.method == 'POST':
         title = request.form['title']
         body = request.form['body']
+        
         owner = User.query.filter_by(email=session['email']).first()
         title_err = ''
         body_err = ''
@@ -87,12 +90,14 @@ def new_entry():
             blog = Blog(title, body, owner)
             db.session.add(blog)
             db.session.commit()
+            
             id = blog.id
             id_str = str(id)
         return redirect('/blog?id=' + id_str)
 
     else:
         return render_template("new_entry.html", title="Create a new blog entry", title_err=title_err, body_err=body_err)
+
 
 @app.route('/signup', methods=['POST', 'GET'])
 def signup():
